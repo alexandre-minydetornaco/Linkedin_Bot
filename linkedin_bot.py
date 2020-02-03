@@ -16,7 +16,7 @@ from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 
-from credentials import user, password
+from credentials import user, password, message, keyword
 
 
 #GLOBAL VALUES USED IN SCRIPT
@@ -131,6 +131,6 @@ if __name__ == "__main__":
 
 	user_name = user
 	user_password = password
-	user_message = 'Hi, In the course of my masters, I am working on a project on the digitalization of the waste management industry, especially in the logistics section. I think I could learn a lot from you, seeing your experience in the industry. I would love to discuss with you if you have a few minutes to spare.'
-	user_search_keywords = 'Rose Recycling'
+	user_message = message
+	user_search_keywords = keyword
 	main(user_name,user_password,user_message,user_search_keywords)
