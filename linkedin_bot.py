@@ -77,7 +77,9 @@ class LinkedInScrapper():
 		all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
 		all_names = self.driver.find_elements_by_class_name("actor-name")
 
-		for i in range(1, len(all_connect)):
+		# do 2, then scroll down a bit
+
+		for i in range(0, len(all_connect)):
 			time.sleep(3)
 			all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
 			all_names = self.driver.find_elements_by_class_name("actor-name")
@@ -88,17 +90,18 @@ class LinkedInScrapper():
 				all_connect[i].click()
 				time.sleep(2)
 
-				# connect button:
+				# include if has pending instead of connect
 				try:
 					self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect ml2 artdeco-button artdeco-button--2 artdeco-button--primary ember-view']").click()
 				except NoSuchElementException:
 					self.driver.find_element_by_xpath("//*[@class='ml2 pv-s-profile-actions__overflow-toggle artdeco-button artdeco-button--muted artdeco-button--2 artdeco-button--secondary ember-view']/span").click()
-					if self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left  ember-view']/span[1]").text == "Pending":
-						self.driver.execute_script("window.history.go(-1)")
-						continue
-					else:
-						time.sleep(1)
-						self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left  ember-view']/span[1]").click()
+					try:
+						# If invitation has already been sent, then go to next employee.
+						if self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left  ember-view']/span[1]").text == "Pending":
+							self.driver.execute_script("window.history.go(-1)")
+							continue
+					except NoSuchElementException:
+						self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left ember-view']/span[1]").click()
 
 				time.sleep(1)
 				self.driver.find_element_by_xpath("//button[@aria-label='Add a note']").click()
@@ -107,6 +110,8 @@ class LinkedInScrapper():
 				time.sleep(1)
 				self.driver.find_element_by_xpath("//button[@aria-label='Send invitation']").click()
 				self.driver.execute_script("window.history.go(-1)")
+				if i%2==0:
+					self.driver.execute_script("window.scrollBy(0, -20)")
 
 
 
@@ -127,5 +132,5 @@ if __name__ == "__main__":
 	user_name = user
 	user_password = password
 	user_message = 'Hi, In the course of my masters, I am working on a project on the digitalization of the waste management industry, especially in the logistics section. I think I could learn a lot from you, seeing your experience in the industry. I would love to discuss with you if you have a few minutes to spare.'
-	user_search_keywords = '360 waste mgmt'
+	user_search_keywords = 'Rose Recycling'
 	main(user_name,user_password,user_message,user_search_keywords)
