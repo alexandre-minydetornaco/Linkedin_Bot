@@ -70,13 +70,6 @@ class LinkedInScrapper():
 		# class for connect button:
 
 
-
-
-
-		# f = open('results.txt','w')
-		# f.write(str([x.text for x in all_names]))
-
-
 		# do 2, then scroll down a bit
 
 		for i in range(0, 5):
@@ -92,12 +85,12 @@ class LinkedInScrapper():
 			f = open('results.txt','a')
 			f.write(str([x.text for x in all_names]) + '\n')
 
-			time.sleep(1)
+			time.sleep(2)
 
 			if all_names[i].text == 'LinkedIn Member':
 				continue
 			else:
-				all_connect[i].click()
+				all_names[i].click()
 				time.sleep(2)
 
 				# include if has pending instead of connect
@@ -125,9 +118,14 @@ class LinkedInScrapper():
 				self.driver.execute_script("window.history.go(-1)")
 
 		f.write('second for loop'+'\n')
+		checked = []
+
 		for i in range(5,10):
 			time.sleep(3)
-			scroll_delta = int(i)*150
+			# scroll_delta = 5*150 + (int(i)-5)*130
+			# self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
+
+			scroll_delta = 5*180
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
 			time.sleep(1)
@@ -136,19 +134,16 @@ class LinkedInScrapper():
 			all_names = self.driver.find_elements_by_class_name("actor-name")
 
 			f = open('results.txt','a')
-			f.write(str([x.text for x in all_names]) + '\n')
+			f.write(str(len(all_names)) + ' ' + str([x.text for x in all_names]) + str(all_names[i].text) + '\n')
 
-			time.sleep(1)
-			if i>7:
-				i = i-2
-			if i>8:
-				i=i-1
+			time.sleep(2)
 
 			if all_names[i].text == 'LinkedIn Member':
 				continue
 			else:
-				all_connect[i].click()
+				all_names[i].click()
 				time.sleep(2.5)
+				checked.append(all_names[i])
 
 				self.driver.execute_script("window.history.go(-1)")
 
@@ -156,14 +151,10 @@ class LinkedInScrapper():
 	def nextPage(self):
 		#Head to the next page
 		time.sleep(2)	#lets wait for page to load
-		self.driver.executeScript("window.scrollTo(0, document.body.scrollHeight)")
+		self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
 
 		time.sleep(1)
 		self.driver.find_element_by_xpath("//button[@aria-label='Next']").click()
-
-
-
-
 
 
 if __name__ == "__main__":
