@@ -1,10 +1,11 @@
 """
-	Author: Xavid Ramirez
+
 	Desc: Bot to crawl onto linkedin and send out invitations to
 		  users based on search criteria. To be used for educational
 		  purposes when developing crawlers dealing with hidden elements.
 """
 import time
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -12,9 +13,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+
+from bs4 import BeautifulSoup
 
 import random
 
@@ -25,20 +27,17 @@ from credentials import user, password, message, keyword
 url = "https://www.linkedin.com/uas/login?goback=&trk=hb_signin"
 url_2 = 'https://www.linkedin.com/search/results/people/?facetNetwork=%5B%22S%22%5D&keywords=microsoft&origin=FACETED_SEARCH'
 base_search_URL = 'https://www.linkedin.com/search/results/people/?keywords='
-#Webdriver Paths
-# Chromedriver_Path = r'PATH TO CROME DRIVER'
-# Chrome_Options = Options().add_argument('--test-type')
-#END OF GLOBAL VALUES
+
 
 # SCRAPPER CLASS AND IT'S METHODS
 class LinkedInScrapper():
 
-	def __init__(self,USERNAME,PASSWORD,MESSAGE,SEARCH):
+	def __init__(self,username=user,password=password,message=message,search=keyword):
 		self.driver = webdriver.Chrome(ChromeDriverManager().install())
-		self.username = USERNAME
-		self.password = PASSWORD
-		self.message = MESSAGE
-		self.search = SEARCH
+		self.username = user
+		self.password = password
+		self.message = message
+		self.search = keyword
 		self.driver.wait = WebDriverWait(self.driver,5)
 
 	def Login(self):
@@ -63,13 +62,6 @@ class LinkedInScrapper():
 		search_url += "&origin=GLOBAL_SEARCH_HEADER"	#add the last word and the end parameters
 		self.driver.get(search_url)
 
-	def nextPage(self):
-		#Head to the next page
-		time.sleep(2)	#lets wait for page to load
-		Button = self.driver.execute_script("return document.querySelectorAll('button.next')[0]")
-		if(Button != None):
-			self.driver.execute_script("document.querySelectorAll('button.next')[0].click()")
-
 
 	def send_notes(self):
 		#This function queries all the buttons on the page
@@ -78,16 +70,22 @@ class LinkedInScrapper():
 		# class for connect button:
 
 
+
+		all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
+		all_names = self.driver.find_elements_by_class_name("actor-name")
+
+		f = open('results.txt','w')
+		f.write(str([x.text for x in all_names]))
+
+
 		# do 2, then scroll down a bit
 
-		for i in range(0, 10):
+		for i in range(0, len(all_names)):
+			# scroll en bas puis choppe tous les noms
 
 			time.sleep(3)
-			scroll_delta = int(i)*150
+			scroll_delta = [i]*150
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
-
-			all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
-			all_names = self.driver.find_elements_by_class_name("actor-name")
 
 			time.sleep(1)
 
@@ -122,25 +120,24 @@ class LinkedInScrapper():
 				self.driver.execute_script("window.history.go(-1)")
 
 
+	def nextPage(self):
+		#Head to the next page
+		time.sleep(2)	#lets wait for page to load
+		self.driver.executeScript("window.scrollTo(0, document.body.scrollHeight)")
+
+		time.sleep(1)
+		self.driver.find_element_by_xpath("//button[@aria-label='Next']").click()
 
 
 
 
 
-## HERE WE WILL START THE SCRAPPER
-def main(username,password,message,search_keywords):
-	L = LinkedInScrapper(username,password,message,search_keywords)
+
+if __name__ == "__main__":
+	#Call the function
+	L = LinkedInScrapper()
 	L.Login()
 	L.Search()
 	while True:
 		L.send_notes()
 		L.nextPage()
-
-if __name__ == "__main__":
-	#Call the function
-
-	user_name = user
-	user_password = password
-	user_message = message
-	user_search_keywords = keyword
-	main(user_name,user_password,user_message,user_search_keywords)
