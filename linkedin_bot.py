@@ -16,11 +16,16 @@ from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
 
+# sound
+import subprocess
+
+import numpy as np
+
 from bs4 import BeautifulSoup
 
 import random
 
-from credentials import user, password, message, keyword
+from credentials import user, password, message, keyword, sound
 
 
 #GLOBAL VALUES USED IN SCRIPT
@@ -32,12 +37,13 @@ base_search_URL = 'https://www.linkedin.com/search/results/people/?keywords='
 # SCRAPPER CLASS AND IT'S METHODS
 class LinkedInScrapper():
 
-	def __init__(self,username=user,password=password,message=message,search=keyword):
+	def __init__(self,username=user,password=password,message=message,search=keyword, sound_on = sound):
 		self.driver = webdriver.Chrome(ChromeDriverManager().install())
 		self.username = user
 		self.password = password
 		self.message = message
 		self.search = keyword
+		self.sound_on = sound
 		self.driver.wait = WebDriverWait(self.driver,5)
 
 	def Login(self):
@@ -61,9 +67,11 @@ class LinkedInScrapper():
 			search_url += word + '%20'
 		search_url += "&origin=GLOBAL_SEARCH_HEADER"	#add the last word and the end parameters
 		self.driver.get(search_url)
+		if self.sound_on:
+			subprocess.call(['afplay',"chinese-gong.wav"])
 
 
-	def send_notes(self):
+	def send_notesT(self):
 		#This function queries all the buttons on the page
 		#adding notes/invitations to only users who have not connected with you
 
@@ -81,6 +89,12 @@ class LinkedInScrapper():
 
 			all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
 			all_names = self.driver.find_elements_by_class_name("actor-name")
+			all_names_text = [x.text for x in all_names]
+
+			if i == 0:
+				unchecked = [x.text for x in all_names][:5]
+
+
 
 			f = open('results.txt','a')
 			f.write(str([x.text for x in all_names]) + '\n')
@@ -90,7 +104,9 @@ class LinkedInScrapper():
 			if all_names[i].text == 'LinkedIn Member':
 				continue
 			else:
-				all_names[i].click()
+				all_names[np.where(all_names_text == unchecked[0])[0][0]].click()
+				unchecked = unchecked[1:]
+				# all_names[i].click()
 				time.sleep(2)
 
 				# include if has pending instead of connect
@@ -116,41 +132,95 @@ class LinkedInScrapper():
 				# time.sleep(1)
 				# self.driver.find_element_by_xpath("//button[@aria-label='Send invitation']").click()
 				self.driver.execute_script("window.history.go(-1)")
-
 		f.write('second for loop'+'\n')
-		checked = []
+
+		unchecked = []
+
 
 		for i in range(5,10):
 			time.sleep(3)
 			# scroll_delta = 5*150 + (int(i)-5)*130
-			# self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
-			scroll_delta = 5*180
+			scroll_delta = 5*170 + (int(i)-5)*110
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
 			time.sleep(1)
 
-			all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
 			all_names = self.driver.find_elements_by_class_name("actor-name")
+			all_names_text = [x.text for x in all_names]
+
+			if len(all_names) == 10:
+				unchecked = [x.text for x in all_names][5:]
+
 
 			f = open('results.txt','a')
-			f.write(str(len(all_names)) + ' ' + str([x.text for x in all_names]) + str(all_names[i].text) + '\n')
+			f.write('iter loop:' + str(i) + ' ' + str(len(all_names)) + ' ' + str([x.text for x in all_names]) + str(all_names[i].text) + '\n')
 
 			time.sleep(2)
 
-			if all_names[i].text == 'LinkedIn Member':
+			being_checked = all_names[i]
+			being_checked_text = being_checked.text
+
+			if being_checked.text == 'LinkedIn Member':
 				continue
 			else:
-				all_names[i].click()
-				time.sleep(2.5)
-				checked.append(all_names[i])
+				if len(all_names)==10:
+					being_checked.click()
+					time.sleep(1)
+					unchecked = unchecked[unchecked != being_checked_text]
+				else:
+					# click on element with text = unchecked[0]
+					all_names[np.where(all_names_text == unchecked[0])[0][0]].click()
+					unchecked = unchecked[1:]
 
-				self.driver.execute_script("window.history.go(-1)")
+			time.sleep(2)
+
+			self.driver.execute_script("window.history.go(-1)")
+
+
+
+
+
+				# elif all_names[i].text == unchecked[0]:
+				# 	all_names[i].click()
+				# 	unchecked = unchecked[unchecked != all_names[i].text]
+
+
+
+
+
+
+
+
+
+	def send_notes(self):
+		#This function queries all the buttons on the page
+		#adding notes/invitations to only users who have not connected with you
+
+		#Lets wait for the buttons to load
+		time.sleep(4)
+		WebDriverWait(self.driver,120).until(EC.presence_of_element_located((By.CSS_SELECTOR,".search-result__actions--primary.button-secondary-medium.m5")))
+		#Lets grab all the buttons
+		Buttons = self.driver.execute_script("return document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5').length")
+		for i in range(0,Buttons):
+			#Check if button still says connect
+			if("Connect" in self.driver.execute_script("return document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5')["+str(i)+"].textContent")):
+				self.driver.execute_script("document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5')["+str(i)+"].click()")
+				#Find the dialoug box that the Javascript brought up
+				self.driver.execute_script("document.querySelectorAll('button.button-secondary-large')[1].click()")
+				self.driver.find_element_by_name("message").send_keys(self.message)
+				#send invitation
+				self.driver.find_element_by_css_selector(".button-primary-large.ml3").click()
+			#Done, lets wait for page to load a bit
+			time.sleep(2)
 
 
 	def nextPage(self):
 		#Head to the next page
-		time.sleep(2)	#lets wait for page to load
+		if self.sound_on:
+			subprocess.call(['afplay',"chinese-gong.wav"])
+		else:
+			time.sleep(2)	#lets wait for page to load
 		self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
 
 		time.sleep(1)
@@ -163,5 +233,5 @@ if __name__ == "__main__":
 	L.Login()
 	L.Search()
 	while True:
-		L.send_notes()
+		L.send_notesT()
 		L.nextPage()
