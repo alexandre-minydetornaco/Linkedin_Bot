@@ -87,7 +87,6 @@ class LinkedInScrapper():
 			scroll_delta = int(i)*150
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
-			all_connect = self.driver.find_elements_by_xpath("//*[@class='search-entity search-result search-result--person search-result--occlusion-enabled ember-view']/div/div[1]")
 			all_names = self.driver.find_elements_by_class_name("actor-name")
 			all_names_text = [x.text for x in all_names]
 
@@ -95,9 +94,8 @@ class LinkedInScrapper():
 				unchecked = [x.text for x in all_names][:5]
 
 
-
 			f = open('results.txt','a')
-			f.write(str([x.text for x in all_names]) + '\n')
+			f.write(str([x.text for x in all_names]) + 'unchecked: ' + str(unchecked) + 'all_names_text: ' + str(all_names_text) + '\n')
 
 			time.sleep(2)
 

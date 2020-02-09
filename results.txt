@@ -1,5 +1,0 @@
-['Daniel Glazman', 'Anthony Gutman', 'Satsuki ASHIBE', 'Valeria Frasca', 'Guillaume Piette', 'Julie -christie Gruber']
-['Daniel Glazman', 'Anthony Gutman', 'Satsuki ASHIBE', 'Valeria Frasca', 'Guillaume Piette']
-['Daniel Glazman', 'Anthony Gutman', 'Satsuki ASHIBE', 'Valeria Frasca', 'Guillaume Piette', 'Julie -christie Gruber', 'Edouard Binchet', 'Ivan BRATICEVIC', 'Delphine Gariglio-Tostain']
-['Daniel Glazman', 'Anthony Gutman', 'Satsuki ASHIBE', 'Valeria Frasca', 'Guillaume Piette', 'Julie -christie Gruber', 'Edouard Binchet', 'Ivan BRATICEVIC', 'Delphine Gariglio-Tostain', 'Fiona Paladini']
-['Daniel Glazman', 'Anthony Gutman', 'Satsuki ASHIBE', 'Valeria Frasca', 'Guillaume Piette', 'Julie -christie Gruber']
