@@ -71,20 +71,19 @@ class LinkedInScrapper():
 			subprocess.call(['afplay',"chinese-gong.wav"])
 
 
-	def send_notesT(self):
+
+	def send_notes(self):
 		#This function queries all the buttons on the page
 		#adding notes/invitations to only users who have not connected with you
 
 		# class for connect button:
 
-
 		# do 2, then scroll down a bit
 
 		for i in range(0, 5):
 			# scroll en bas puis choppe tous les noms
-
 			time.sleep(3)
-			scroll_delta = int(i)*150
+			scroll_delta = int(i)*140
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
 			all_names = self.driver.find_elements_by_class_name("actor-name")
@@ -93,44 +92,47 @@ class LinkedInScrapper():
 			if i == 0:
 				unchecked = [x.text for x in all_names][:5]
 
-
 			f = open('results.txt','a')
-			f.write(str([x.text for x in all_names]) + 'unchecked: ' + str(unchecked) + 'all_names_text: ' + str(all_names_text) + '\n')
+			f.write(str([x.text for x in all_names]) + 'unchecked: ' + str(unchecked) + '\n')
 
 			time.sleep(2)
 
 			if all_names[i].text == 'LinkedIn Member':
 				continue
 			else:
-				all_names[np.where(all_names_text == unchecked[0])[0][0]].click()
+				all_names[np.where(np.array(all_names_text) == unchecked[0])[0][0]].click()
 				unchecked = unchecked[1:]
-				# all_names[i].click()
-				time.sleep(2)
+				time.sleep(3)
 
-				# include if has pending instead of connect
+				# # include if has pending instead of connect
 				# try:
-				# 	self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect ml2 artdeco-button artdeco-button--2 artdeco-button--primary ember-view']").click()
+				# 	driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect ml2 artdeco-button artdeco-button--2 artdeco-button--primary ember-view']").click()
 				# except NoSuchElementException:
-				# 	self.driver.find_element_by_xpath("//*[@class='ml2 pv-s-profile-actions__overflow-toggle artdeco-button artdeco-button--muted artdeco-button--2 artdeco-button--secondary ember-view']/span").click()
+				# 	driver.find_element_by_xpath("//*[@class='ml2 pv-s-profile-actions__overflow-toggle artdeco-button artdeco-button--muted artdeco-button--2 artdeco-button--secondary ember-view']/span").click()
+				#
 				# 	try:
 				# 		# If invitation has already been sent, then go to next employee.
-				# 		if self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left  ember-view']/span[1]").text == "Pending":
-				# 			self.driver.execute_script("window.history.go(-1)")
+				# 		if driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left  ember-view']/span[1]").text == "Pending":
+				# 			driver.execute_script("window.history.go(-1)")
 				# 			continue
+				#
 				# 	except NoSuchElementException:
 				# 		try:
-				# 			self.driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left ember-view']/span[1]").click()
+				# 			driver.find_element_by_xpath("//*[@class='pv-s-profile-actions pv-s-profile-actions--connect pv-s-profile-actions__overflow-button full-width text-align-left ember-view']/span[1]").click()
 				# 		except NoSuchElementException:
 				# 			continue
+				# time.sleep(1)
+				# driver.find_element_by_xpath("//button[@aria-label='Add a note']").click()
+				# time.sleep(1)
+				# driver.find_element_by_name("message").send_keys(self.message)
+				# time.sleep(1)
+				# driver.find_element_by_xpath("//button[@aria-label='Send invitation']").click()
 
-				# time.sleep(1)
-				# self.driver.find_element_by_xpath("//button[@aria-label='Add a note']").click()
-				# time.sleep(1)
-				# self.driver.find_element_by_name("message").send_keys(self.message)
-				# time.sleep(1)
-				# self.driver.find_element_by_xpath("//button[@aria-label='Send invitation']").click()
 				self.driver.execute_script("window.history.go(-1)")
+
 		f.write('second for loop'+'\n')
+
+
 
 		unchecked = []
 
@@ -139,7 +141,7 @@ class LinkedInScrapper():
 			time.sleep(3)
 			# scroll_delta = 5*150 + (int(i)-5)*130
 
-			scroll_delta = 5*170 + (int(i)-5)*110
+			scroll_delta = 5 * 170 + (int(i)-5) * 110
 			self.driver.execute_script("window.scrollBy(0, "+str(scroll_delta) + ")")
 
 			time.sleep(1)
@@ -147,12 +149,11 @@ class LinkedInScrapper():
 			all_names = self.driver.find_elements_by_class_name("actor-name")
 			all_names_text = [x.text for x in all_names]
 
-			if len(all_names) == 10:
+			if i == 5:
 				unchecked = [x.text for x in all_names][5:]
 
-
 			f = open('results.txt','a')
-			f.write('iter loop:' + str(i) + ' ' + str(len(all_names)) + ' ' + str([x.text for x in all_names]) + str(all_names[i].text) + '\n')
+			f.write('iter loop:' + str(i) + ' ' + str(len(all_names)) + ' ' + str([x.text for x in all_names]) + ' ' + str(unchecked) + '\n')
 
 			time.sleep(2)
 
@@ -162,55 +163,13 @@ class LinkedInScrapper():
 			if being_checked.text == 'LinkedIn Member':
 				continue
 			else:
-				if len(all_names)==10:
-					being_checked.click()
-					time.sleep(1)
-					unchecked = unchecked[unchecked != being_checked_text]
-				else:
-					# click on element with text = unchecked[0]
-					all_names[np.where(all_names_text == unchecked[0])[0][0]].click()
-					unchecked = unchecked[1:]
+				# click on element with text = unchecked[0]
+				all_names[np.where(np.array(all_names_text) == unchecked[0])[0][0]].click()
+				unchecked = unchecked[1:]
 
 			time.sleep(2)
 
 			self.driver.execute_script("window.history.go(-1)")
-
-
-
-
-
-				# elif all_names[i].text == unchecked[0]:
-				# 	all_names[i].click()
-				# 	unchecked = unchecked[unchecked != all_names[i].text]
-
-
-
-
-
-
-
-
-
-	def send_notes(self):
-		#This function queries all the buttons on the page
-		#adding notes/invitations to only users who have not connected with you
-
-		#Lets wait for the buttons to load
-		time.sleep(4)
-		WebDriverWait(self.driver,120).until(EC.presence_of_element_located((By.CSS_SELECTOR,".search-result__actions--primary.button-secondary-medium.m5")))
-		#Lets grab all the buttons
-		Buttons = self.driver.execute_script("return document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5').length")
-		for i in range(0,Buttons):
-			#Check if button still says connect
-			if("Connect" in self.driver.execute_script("return document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5')["+str(i)+"].textContent")):
-				self.driver.execute_script("document.querySelectorAll('.search-result__actions--primary.button-secondary-medium.m5')["+str(i)+"].click()")
-				#Find the dialoug box that the Javascript brought up
-				self.driver.execute_script("document.querySelectorAll('button.button-secondary-large')[1].click()")
-				self.driver.find_element_by_name("message").send_keys(self.message)
-				#send invitation
-				self.driver.find_element_by_css_selector(".button-primary-large.ml3").click()
-			#Done, lets wait for page to load a bit
-			time.sleep(2)
 
 
 	def nextPage(self):
@@ -231,5 +190,5 @@ if __name__ == "__main__":
 	L.Login()
 	L.Search()
 	while True:
-		L.send_notesT()
+		L.send_notes()
 		L.nextPage()
