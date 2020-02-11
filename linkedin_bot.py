@@ -132,8 +132,6 @@ class LinkedInScrapper():
 
 		f.write('second for loop'+'\n')
 
-
-
 		unchecked = []
 
 
@@ -157,10 +155,7 @@ class LinkedInScrapper():
 
 			time.sleep(2)
 
-			being_checked = all_names[i]
-			being_checked_text = being_checked.text
-
-			if being_checked.text == 'LinkedIn Member':
+			if unchecked[0] == 'LinkedIn Member':
 				continue
 			else:
 				# click on element with text = unchecked[0]
