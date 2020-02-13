@@ -12,35 +12,58 @@ import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
+
 from webdriver_manager.chrome import ChromeDriverManager
+from bs4 import BeautifulSoup
+import re
 
-from credentials import user, password
-
-#GLOBAL VALUES USED IN SCRIPT
-url = "https://www.welcometothejungle.com/fr/jobs#signin?ref=header"
-url_2 = ''
+# GLOBAL VALUES USED IN SCRIPT
+#url = "https://www.welcometothejungle.com/fr/jobs#signin?ref=header"
+url = "https://www.welcometothejungle.com/fr/jobs?page=1&configure%5Bfilters%5D=website.reference%3Awttj_fr&configure%5BhitsPerPage%5D=30&aroundQuery=France&refinementList%5Boffice.country_code%5D%5B%5D=FR&refinementList%5Bcontract_type_names.fr%5D%5B%5D=CDI&refinementList%5Bcontract_type_names.fr%5D%5B%5D=Stage&query=%22data%20analyst%22&range%5Bexperience_level_minimum%5D%5Bmin%5D=0&range%5Bexperience_level_minimum%5D%5Bmax%5D=1"
+url_2 = 'https://www.welcometothejungle.com/fr/companies/kapten/jobs/data-analyst-h-f-cdi-paris_levallois-perret_KAPTE_8m2plWg'
 base_search_URL = 'https://www.welcometothejungle.com/fr/jobs?query=%22Data%20Analyst%22'
 
 
 # SCRAPPER CLASS AND IT'S METHODS
-class LinkedInScrapper():
+class WTTScrapper():
 
-	def __init__(self,username=user,password=password):
-		self.driver = webdriver.Chrome(ChromeDriverManager().install())
-		self.username = user
-		self.password = password
-		self.driver.wait = WebDriverWait(self.driver,5)
+    def __init__(self):
+        self.driver = webdriver.Chrome(ChromeDriverManager().install())
+        self.driver.wait = WebDriverWait(self.driver, 1)
 
-	def Login(self):
-		#lets get to the site
-		self.driver.get(url)
-		time.sleep(2)
-		try:
-			self.driver.find_element_by_name("Adresse email").send_keys(self.username)
-			self.driver.find_element_by_name("Mot de passe").send_keys(self.password+Keys.RETURN)
-			time.sleep(2)	#give some time for the login.
-		except Exception as a:
-			print(str(a))
+    def Login(self):
+         # lets get to the site
+         self.driver.get(url)
+
+    def click(self):
+#        for i in range(1, 31, 1):
+#            i = 1
+#       offer = self.driver.find_elements_by_xpath(f'//*[@id="app"]/div/div/main/section/div/div[1]/ul/li[{i}]')
+        self.driver.find_element_by_class_name("ais-Hits-item").click()
+
+    def getText(self):
+
+        data = self.driver.page_source
+        soup = BeautifulSoup(data, 'html.parser')
+        result = soup.find(string=re.compile("Profil recherché"))
+        print(str(result))
+
+        #text = result.next_sibling.get_text()
+        #f = open('results.txt', 'a')
+        #f.write(text.encode('utf-8').decode('ascii', 'ignore'))
+
+    def getText2(self):
+
+        text = self.driver.find_element_by_xpath("//*[@class='sc-12bzhsi-16 eXgLWp'][text()[contains(.,'Profil recherché')]]").text
+        f = open('results.txt', 'a')
+        f.write(str(text))
+
+
+
+L = WTTScrapper()
+L.Login()
+L.click()
+L.getText2()
 
 #	def Search(self):
 #		#Lets search based on what keywords we chose
