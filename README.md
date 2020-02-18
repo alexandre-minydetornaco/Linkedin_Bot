@@ -1,16 +1,6 @@
-# Linkedin_Bot
-# STILL A WORK IN PROGRESS - LMK IF YOU HAVE ANY COMMENTS/MANAGE TO MAKE IT WORK
-Linkedin Bot that takes for input: 
-* a search keyword 
-* a personalized message.  
-It sends a connection request + a note to all the people matching the keyword criterion.
+# Wtjj-BOT
+# STILL A WORK IN PROGRESS
+Welcome To the Jungle Bot that takes for input: 
+* a url
 
-For this to work, you need to create a new file in the same folder with the name: credentials.py  
-the content of the file should be your linkedin credentials + the input for the bot as follows:
-
-* user = 'thatsyouremail@gmail.com"   
-* password = 'yourpasswordisprobablynotsafebecauseyouusedqwertyu1'
-* sound = True (not yet implemented)
-* message = ''
-* keyword = 'McGill'
-* job_title_contains = ['CEO','Data','Analytics','analyst'] (not yet implemented)
+It uses Selenium and beautiful soup to click on every job offers of the URL, then scraps the 'preferred profile' sectionand saves it into a .txt files
